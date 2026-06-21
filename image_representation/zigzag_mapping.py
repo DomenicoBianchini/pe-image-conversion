@@ -7,6 +7,7 @@ class ZigZagMapping(ImageMappingStrategy):
 
     def createImage(self, byteData):
 
+        # inizializzazione del tensore immagine usando altezza, larghezza e numero di canali impostati
         image = np.zeros(
             (
                 self.height,
@@ -18,6 +19,7 @@ class ZigZagMapping(ImageMappingStrategy):
 
         index = 0
 
+        # mappatura zigzag dei byte con percorrenza alternata delle righe
         for y in range(self.height):
 
             if y % 2 == 0:

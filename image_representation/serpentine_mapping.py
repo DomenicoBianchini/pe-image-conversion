@@ -7,6 +7,7 @@ class SerpentineMapping(ImageMappingStrategy):
 
     def createImage(self, byteData):
 
+        # inizializzazione del tensore immagine usando altezza, larghezza e numero di canali impostati
         image = np.zeros(
             (
                 self.height,
@@ -18,6 +19,7 @@ class SerpentineMapping(ImageMappingStrategy):
 
         index = 0
 
+        # mappatura serpentina dei byte con percorrenza diagonale alternata
         for diagonal in range(self.height + self.width - 1):
 
             positions = []

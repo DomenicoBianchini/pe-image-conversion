@@ -16,6 +16,8 @@ class Image:
         return self.data.shape[2]
 
     def save(self, fileName):
+
+        # salvataggio dell'immagine in base al numero di canali
         if self.getNumberOfChannels() == 1:
             image = PILImage.fromarray(self.data[:, :, 0], mode="L")
         else:

@@ -8,6 +8,7 @@ class Application:
 
     def parseConfig(self, configPath):
 
+        # lettura del file di configurazione
         config = configparser.ConfigParser()
         config.read(configPath)
 
@@ -17,29 +18,28 @@ class Application:
         width = int(settings["width"])
         numberOfChannels = int(settings["numberOfChannels"])
         height = None
+
+        # se height è vuota viene lasciata None per la modalità variable
         if settings.get("height"):
             height = int(settings["height"])
 
-        ImageMappingStrategy.setImageSize(
-            width,
-            height,
-            numberOfChannels
-        )
+        # configurazione delle dimensioni e del numero di canali per il mapping
+        ImageMappingStrategy.setImageSize(width,height,numberOfChannels)
 
         peFile = PEFile()
 
-        image = peFile.read(
-            peFilePath,
-            mappingType
-        )
-        
+        # lettura del file PE e creazione dell'immagine corrispondente
+        image = peFile.read(peFilePath,mappingType)
+
         if image.getNumberOfChannels() == 1:
-            colorMode = "GRAY"
+            channelType = "GRAY"
         else:
-            colorMode = "RGB"
+            channelType = "RGB"
 
         imageSize = str(image.getWidth()) + "x" + str(image.getHeight())
-        fileName = "output/" + mappingType.name + "_" + colorMode + "_" + imageSize + ".png"
+
+        # salvataggio dell'immagine con un nome che indica il mapping, il tipo di canali e le dimensioni
+        fileName = "output/" + mappingType.name + "_" + channelType + "_" + imageSize + ".png"
 
         image.save(fileName)
 
