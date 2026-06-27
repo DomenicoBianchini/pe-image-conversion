@@ -7,12 +7,19 @@ class SerpentineMapping(ImageMappingStrategy):
 
     def createImage(self, byteData):
 
+        width = self.getWidth()
+        height = self.getHeight()
+        numberOfChannels = self.getNumberOfChannels()
+
+        if height is None:
+            height = self.getVariableHeight(len(byteData))
+
         # inizializzazione del tensore immagine usando altezza, larghezza e numero di canali impostati
         image = np.zeros(
             (
-                self.height,
-                self.width,
-                self.numberOfChannels
+                height,
+                width,
+                numberOfChannels
             ),
             dtype=np.uint8
         )
@@ -20,12 +27,12 @@ class SerpentineMapping(ImageMappingStrategy):
         index = 0
 
         # mappatura serpentina dei byte con percorrenza diagonale alternata
-        for diagonal in range(self.height + self.width - 1):
+        for diagonal in range(height + width - 1):
 
             positions = []
 
-            startY = max(0, diagonal - (self.width - 1))
-            endY = min(self.height - 1, diagonal)
+            startY = max(0, diagonal - (width - 1))
+            endY = min(height - 1, diagonal)
 
             for y in range(startY, endY + 1):
                 x = diagonal - y
@@ -35,7 +42,7 @@ class SerpentineMapping(ImageMappingStrategy):
                 positions.reverse()
 
             for y, x in positions:
-                for c in range(self.numberOfChannels):
+                for c in range(numberOfChannels):
 
                     if index < len(byteData):
                         image[y][x][c] = byteData[index]

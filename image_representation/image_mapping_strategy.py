@@ -3,27 +3,40 @@ from abc import ABC, abstractmethod
 class ImageMappingStrategy(ABC):
 
     # dimensioni dell'immagine e numero di canali, condivise da tutte le strategie
-    width = None
-    height = None
-    numberOfChannels = None
+    __width = None
+    __height = None
+    __numberOfChannels = None
 
     @classmethod
     def setImageSize(cls, width, height, numberOfChannels):
 
-        cls.width = width
-        cls.height = height
-        cls.numberOfChannels = numberOfChannels
+        cls.__width = width
+        cls.__height = height
+        cls.__numberOfChannels = numberOfChannels
 
     @classmethod
-    def setVariableHeight(cls, width, byteCount):
+    def getVariableHeight(cls, byteCount):
 
-        cls.width = width
+        # calcolo dell'altezza necessaria senza modificare la configurazione
+        pixels = byteCount // cls.__numberOfChannels
+        height = (pixels + cls.__width - 1) // cls.__width
 
-        # calcolo del numero di pixel necessari in base ai byte e al numero di canali
-        pixels = byteCount // cls.numberOfChannels
+        return height
 
-        # calcolo dell'altezza necessaria per contenere tutti i pixel, arrotondando per eccesso
-        cls.height = (pixels + width - 1) // width
+    @classmethod
+    def getWidth(cls):
+
+        return cls.__width
+
+    @classmethod
+    def getHeight(cls):
+
+        return cls.__height
+
+    @classmethod
+    def getNumberOfChannels(cls):
+
+        return cls.__numberOfChannels
 
     @abstractmethod
     def createImage(self, data):

@@ -13,7 +13,7 @@ class Application:
         config.read(configPath)
 
         settings = config["IMAGE_CONFIGURATION"]
-        peFilePath = settings["peFilePath"]
+        filesPath = settings["filesPath"]
         mappingType = MappingType(settings["mappingType"])
         width = int(settings["width"])
         numberOfChannels = int(settings["numberOfChannels"])
@@ -24,24 +24,12 @@ class Application:
             height = int(settings["height"])
 
         # configurazione delle dimensioni e del numero di canali per il mapping
-        ImageMappingStrategy.setImageSize(width,height,numberOfChannels)
+        ImageMappingStrategy.setImageSize(width, height, numberOfChannels)
 
         peFile = PEFile()
 
-        # lettura del file PE e creazione dell'immagine corrispondente
-        image = peFile.read(peFilePath,mappingType)
-
-        if image.getNumberOfChannels() == 1:
-            channelType = "GRAY"
-        else:
-            channelType = "RGB"
-
-        imageSize = str(image.getWidth()) + "x" + str(image.getHeight())
-
-        # salvataggio dell'immagine con un nome che indica il mapping, il tipo di canali e le dimensioni
-        fileName = "output/" + mappingType.name + "_" + channelType + "_" + imageSize + ".png"
-
-        image.save(fileName)
+        # lettura dei file PE e creazione delle immagini
+        peFile.read(filesPath, mappingType)
 
 
 if __name__ == "__main__":

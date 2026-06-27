@@ -1,41 +1,42 @@
-from .mapping_type import MappingType
+import os
 
+from .mapping_type import MappingType
 from image_representation.linear_mapping import LinearMapping
 from image_representation.zigzag_mapping import ZigZagMapping
 from image_representation.serpentine_mapping import SerpentineMapping
-
 from image_representation.image_mapping_strategy import ImageMappingStrategy
 
 class PEFile:
 
-    def read(self, filePath, mappingType):
+    def read(self, filesPath, mappingType):
 
-        # legge il file PE e mantiene i byte solo internamente alla classe
-        byteData = self.__readBytes(filePath)
+        # lettura di tutti i file PE presenti nella cartella
+        for fileName in os.listdir(filesPath):
 
-        # se l'altezza non è stata impostata nel file di configurazione,
-        # viene calcolata in base alla dimensione del file
-        if ImageMappingStrategy.height is None:
-            ImageMappingStrategy.setVariableHeight(
-                ImageMappingStrategy.width,
-                len(byteData)
-            )
+            filePath = os.path.join(filesPath, fileName)
 
-        # selezione della strategia di mapping
-        if mappingType == MappingType.LINEAR:
-            strategy = LinearMapping()
+            # apertura e lettura del file PE in modalità binaria
+            with open(filePath, "rb") as file:
+                byteData = file.read()
 
-        elif mappingType == MappingType.ZIGZAG:
-            strategy = ZigZagMapping()
+            # selezione della strategia di mapping
+            if mappingType == MappingType.LINEAR:
+                strategy = LinearMapping()
 
-        elif mappingType == MappingType.SERPENTINE:
-            strategy = SerpentineMapping()
+            elif mappingType == MappingType.ZIGZAG:
+                strategy = ZigZagMapping()
 
-        # la strategia costruisce direttamente l'immagine finale
-        return strategy.createImage(byteData)
+            elif mappingType == MappingType.SERPENTINE:
+                strategy = SerpentineMapping()
 
-    def __readBytes(self, filePath):
+            # creazione dell'immagine a partire dai byte del file PE
+            image = strategy.createImage(byteData)
 
-        # apertura e lettura del file in modalità binaria
-        with open(filePath, "rb") as file:
-            return file.read()
+            # se l'altezza è variabile, ridimensiona l'immagine per la CNN
+            if ImageMappingStrategy.getHeight() is None:
+                targetSize = ImageMappingStrategy.getWidth()
+                image = image.resize(targetSize, targetSize)
+
+            # salvataggio dell'immagine generata
+            outputPath = "output/" + os.path.splitext(fileName)[0] + ".png"
+            image.save(outputPath)
