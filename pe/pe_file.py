@@ -37,6 +37,6 @@ class PEFile:
                 targetSize = ImageMappingStrategy.getWidth()
                 image = image.resize(targetSize, targetSize)
 
-            # salvataggio dell'immagine generata
-            outputPath = "output/" + os.path.splitext(fileName)[0] + ".png"
+            # salvataggio dell'immagine generata con le dimensioni finali nel nome
+            outputPath = "images/" + os.path.splitext(fileName)[0] + "_" + str(image.getWidth()) + "x" + str(image.getHeight()) + ".png"
             image.save(outputPath)
