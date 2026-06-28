@@ -35,4 +35,4 @@ class Application:
 if __name__ == "__main__":
 
     application = Application()
-    application.parseConfig("config.ini")
+    application.parseConfig("pe_config.ini")

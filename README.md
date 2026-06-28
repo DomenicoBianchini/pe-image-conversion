@@ -16,16 +16,10 @@ pip install -r requirements.txt
 
 ## Configurazione
 
-I parametri per la conversione sono impostati nel file:
+I parametri sono divisi in due file di configurazione:
 
-`config.ini`
+- `pe_config.ini`
+	Configura la conversione dei file PE in immagini (cartella dei PE, strategia di mapping, dimensioni immagine, numero di canali).
 
-Nel file di configurazione è possibile modificare il percorso della cartella dei file PE, la strategia di mapping, le dimensioni dell'immagine e il numero di canali.
-
-## Avvio
-
-Per avviare il programma, dalla cartella principale del progetto eseguire:
-
-```bash
-python -m main.application
-```
+- `dl_config.ini`
+	Configura il caricamento del dataset immagini (path cartella immagini e path file CSV delle label).
