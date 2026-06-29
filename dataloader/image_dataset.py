@@ -9,33 +9,33 @@ class ImageDataset(Dataset):
     def __init__(self, imagesPath, labelsPath):
 
         # percorso della cartella con le immagini
-        self.imagesPath = imagesPath
+        self.__imagesPath = imagesPath
 
         # lettura del CSV
         labels = pd.read_csv(labelsPath)
 
         # salviamo i nomi delle immagini
-        self.filenames = labels["filename"].values
+        self.__filenames = labels["filename"].values
 
         # convertiamo le label in tensori PyTorch
-        self.labels = torch.tensor(labels["label"].values, dtype=torch.float32)
+        self.__labels = torch.tensor(labels["label"].values, dtype=torch.float32)
 
 
     def __len__(self):
 
-        return len(self.labels)
+        return len(self.__labels)
 
 
     def __getitem__(self, index):
 
         # recupero nome immagine
-        filename = str(self.filenames[index])
+        filename = str(self.__filenames[index])
 
         # recupero label già convertita
-        label = self.labels[index]
+        label = self.__labels[index]
 
         # costruzione percorso immagine
-        imagePath = self.imagesPath + "/" + filename + ".png"
+        imagePath = self.__imagesPath + "/" + filename + ".png"
 
         # apertura immagine
         image = Image.open(imagePath)
