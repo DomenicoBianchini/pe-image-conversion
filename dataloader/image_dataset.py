@@ -18,7 +18,7 @@ class ImageDataset(Dataset):
         self.__filenames = labels["filename"].values
 
         # convertiamo le label in tensori PyTorch
-        self.__labels = torch.tensor(labels["label"].values, dtype=torch.float32)
+        self.__labels = torch.tensor(labels["label"].values, dtype=torch.long)
 
 
     def __len__(self):
