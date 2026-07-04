@@ -1,6 +1,9 @@
 # dataset samples
 dataset/samples/
 
+# images
+images/
+
 # Python cache
 __pycache__/
 *.pyc
