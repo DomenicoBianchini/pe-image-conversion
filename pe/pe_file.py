@@ -32,11 +32,6 @@ class PEFile:
             # creazione dell'immagine a partire dai byte del file PE
             image = strategy.createImage(byteData)
 
-            # se l'altezza è variabile, ridimensiona l'immagine per la CNN
-            if ImageMappingStrategy.getHeight() is None:
-                targetSize = ImageMappingStrategy.getWidth()
-                image = image.resize(targetSize, targetSize)
-
             # salvataggio dell'immagine generata
             outputPath = "images/" + fileName + ".png"
             image.save(outputPath)

@@ -11,7 +11,7 @@ class ZigZagMapping(ImageMappingStrategy):
         height = self.getHeight()
         numberOfChannels = self.getNumberOfChannels()
 
-        if height is None:
+        if height == 0:
             height = self.getVariableHeight(len(byteData))
 
         # inizializzazione del tensore immagine usando altezza, larghezza e numero di canali impostati

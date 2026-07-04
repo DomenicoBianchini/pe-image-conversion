@@ -3,36 +3,70 @@ import configparser
 from pe.pe_file import PEFile
 from pe.mapping_type import MappingType
 from image_representation.image_mapping_strategy import ImageMappingStrategy
+from dataloader.data_loader import DataLoader
 
 class Application:
 
-    def parseConfig(self, configPath):
+    def __parseConfig(self, configPath):
 
-        # lettura del file di configurazione
         config = configparser.ConfigParser()
         config.read(configPath)
 
-        settings = config["IMAGE_CONFIGURATION"]
-        filesPath = settings["filesPath"]
-        mappingType = MappingType(settings["mappingType"])
-        width = int(settings["width"])
-        numberOfChannels = int(settings["numberOfChannels"])
-        height = None
+        # lettura configurazione della parte di conversione PE -> immagini
+        imageConfig = config["IMAGE_CONFIGURATION"]
 
-        # se height è vuota viene lasciata None per la modalità variable
-        if settings.get("height"):
-            height = int(settings["height"])
+        # flag per abilitare la parte di conversione PE -> immagini
+        self.peEnabled = int(imageConfig["enabled"])
 
-        # configurazione delle dimensioni e del numero di canali per il mapping
-        ImageMappingStrategy.setImageSize(width, height, numberOfChannels)
+        # parametri della parte di conversione PE -> immagini
+        self.filesPath = imageConfig["filesPath"]
+        self.mappingType = MappingType(imageConfig["mappingType"])
+        self.width = int(imageConfig["width"])
+        self.height = int(imageConfig["height"])
+        self.numberOfChannels = int(imageConfig["numberOfChannels"])
 
-        peFile = PEFile()
+        # lettura configurazione della parte di dataset + dataloader
+        datasetConfig = config["DATASET_CONFIGURATION"]
 
-        # lettura dei file PE e creazione delle immagini
-        peFile.read(filesPath, mappingType)
+        # flag per abilitare la parte di dataset e dataloader
+        self.datasetEnabled = int(datasetConfig["enabled"])
 
+        # path csv con mapping immagini-label
+        self.imageMapping = datasetConfig["imageMapping"]
+
+        # dimensioni del resize
+        self.resizeWidth = int(datasetConfig["resizeWidth"])
+        self.resizeHeight = int(datasetConfig["resizeHeight"])
+
+    def main(self):
+
+        # lettura del file di configurazione
+        self.__parseConfig("config.ini")
+
+        # esecuzione pipeline conversione PE
+        if self.peEnabled == 1:
+
+            # configurazione delle dimensioni e del numero di canali per il mapping
+            ImageMappingStrategy.setImageSize(self.width, self.height, self.numberOfChannels)
+
+            # avvio lettura file PE e generazione immagini
+            peFile = PEFile()
+            peFile.read(self.filesPath, self.mappingType)
+
+        # esecuzione pipeline dataset e dataloader
+        if self.datasetEnabled == 1:
+
+            # verifica se è necessario effettuare il resize delle immagini
+            if self.resizeHeight != 0:
+                needResize = True
+            else:
+                needResize = False
+
+            # costruzione dataloader
+            dataLoader = DataLoader()
+            dataLoader.buildDataLoader(self.imageMapping, needResize, self.resizeWidth, self.resizeHeight)
 
 if __name__ == "__main__":
 
-    application = Application()
-    application.parseConfig("pe_config.ini")
+    app = Application()
+    app.main()
