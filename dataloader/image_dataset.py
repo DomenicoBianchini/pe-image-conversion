@@ -1,9 +1,8 @@
 import pandas as pd
 import torch
 import torch.nn as nn
-import numpy as np
+from torchvision.io import read_image
 from torch.utils.data import Dataset
-from PIL import Image
 
 class ImageDataset(Dataset):
 
@@ -42,13 +41,8 @@ class ImageDataset(Dataset):
         # recupero label corrispondente
         label = self.__labels[index]
 
-        image = Image.open(imagePath)
-
-        # conversione dell'immagine in un tensore PyTorch
-        image = torch.tensor(np.array(image), dtype=torch.float32)
-
-        # riordino del tensore a (canali, altezza, larghezza)
-        image = image.permute(2, 0, 1)
+        # lettura diretta dell'immagine come tensore PyTorch
+        image = read_image(imagePath).float()
 
         # resize dell'immagine se necessario
         if self.__needResize:
