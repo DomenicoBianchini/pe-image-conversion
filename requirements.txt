@@ -1,4 +1,5 @@
 numpy
 Pillow
 pandas
+torchvision
 torch
