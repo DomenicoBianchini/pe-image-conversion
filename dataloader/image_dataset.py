@@ -1,7 +1,7 @@
 import pandas as pd
 import torch
 import torch.nn as nn
-from torchvision.io import read_image
+from torchvision.io import read_image, ImageReadMode
 from torch.utils.data import Dataset
 
 class ImageDataset(Dataset):
@@ -42,7 +42,7 @@ class ImageDataset(Dataset):
         label = self.__labels[index]
 
         # lettura diretta dell'immagine come tensore PyTorch
-        image = read_image(imagePath).float()
+        image = read_image(imagePath, mode=ImageReadMode.RGB).float()
 
         # resize dell'immagine se necessario
         if self.__needResize:
