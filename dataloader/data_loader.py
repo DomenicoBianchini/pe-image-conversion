@@ -15,7 +15,7 @@ class DataLoader:
         # stampa controllo numero campioni
         print("Numero di campioni:", len(dataset))
 
-        # test
+        # stampa controllo dimensioni batch
         for images, labels in dataLoader:
 
             print("Batch immagini:", images.shape)
