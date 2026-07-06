@@ -6,10 +6,10 @@ class DataLoader:
 
     def buildDataLoader(self, imageMapping, needResize, resizeWidth, resizeHeight):
 
-        # creazione dataset partendo dal csv con imagePath e label
+        # creazione dataset partendo dal CSV con imagePath e label
         dataset = ImageDataset(imageMapping, needResize, resizeWidth, resizeHeight)
 
-        # creazione dataloader PyTorch
+        # creazione DataLoader PyTorch
         dataLoader = torch.utils.data.DataLoader(dataset, batch_size=32, shuffle=True)
 
         # stampa controllo numero campioni

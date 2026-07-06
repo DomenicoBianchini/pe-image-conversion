@@ -4,6 +4,7 @@ from pe.pe_file import PEFile
 from pe.mapping_type import MappingType
 from image_representation.image_mapping_strategy import ImageMappingStrategy
 from dataloader.data_loader import DataLoader
+from model.resnet_model import ResNetModel
 
 class Application:
 
@@ -25,10 +26,10 @@ class Application:
         self.height = int(imageConfig["height"])
         self.numberOfChannels = int(imageConfig["numberOfChannels"])
 
-        # lettura configurazione della parte di dataset + dataloader
+        # lettura configurazione della parte di dataset, DataLoader e ResNet
         datasetConfig = config["DATASET_CONFIGURATION"]
 
-        # flag per abilitare la parte di dataset e dataloader
+        # flag per abilitare la parte di dataset, DataLoader e ResNet
         self.datasetEnabled = int(datasetConfig["enabled"])
 
         # path csv con mapping immagini-label
@@ -53,7 +54,7 @@ class Application:
             peFile = PEFile()
             peFile.read(self.filesPath, self.mappingType)
 
-        # esecuzione pipeline dataset e dataloader
+        # esecuzione pipeline dataset, DataLoader e ResNet
         if self.datasetEnabled == 1:
 
             # verifica se è necessario effettuare il resize delle immagini
@@ -62,9 +63,15 @@ class Application:
             else:
                 needResize = False
 
-            # costruzione dataloader
+            # costruzione dataset e DataLoader
             dataLoader = DataLoader()
-            dataLoader.buildDataLoader(self.imageMapping, needResize, self.resizeWidth, self.resizeHeight)
+            imageDataloader = dataLoader.buildDataLoader(self.imageMapping, needResize, self.resizeWidth, self.resizeHeight)
+
+            # ResNet modello preaddestrato
+            resnet = ResNetModel()
+            for images, labels in imageDataloader:
+                resnet.predict(images)
+                break
 
 if __name__ == "__main__":
 

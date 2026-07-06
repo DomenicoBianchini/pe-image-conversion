@@ -23,5 +23,5 @@ Il progetto utilizza un unico file di configurazione (`config.ini`), suddiviso i
   Include inoltre un parametro `enabled` che abilita o disabilita l'esecuzione di questa fase della pipeline.
 
 - `DATASET_CONFIGURATION`  
-  Configura la fase di costruzione del dataset e del DataLoader (path del file CSV contenente il mapping immagini-label e parametri per il resize delle immagini).  
+  Configura la fase di costruzione del dataset e del DataLoader per ResNet (path del file CSV contenente il mapping immagini-label e parametri per il resize delle immagini).  
   Include inoltre un parametro `enabled` che abilita o disabilita l'esecuzione di questa fase della pipeline.
