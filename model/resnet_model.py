@@ -14,7 +14,6 @@ class ResNetModel:
         # modalità evaluation
         self.__model.eval()
 
-
     def predict(self, images):
 
         # preprocessing delle immagini
