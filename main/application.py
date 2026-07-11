@@ -1,6 +1,7 @@
 import configparser
 import os
 
+from utils.csv_image_mapping import CSVImageMapping
 from pe.pe_file import PEFile
 from pe.mapping_type import MappingType
 from image_representation.image_mapping_strategy import ImageMappingStrategy
@@ -23,7 +24,7 @@ class Application:
         # parametri della parte di conversione PE -> immagini
         self.filesPath = imageConfig["filesPath"]
         self.labelsPath = imageConfig["labelsPath"]
-        self.imagePath = imageConfig["imagePath"]
+        self.imagesPath = imageConfig["imagesPath"]
         self.imageMapping = imageConfig["imageMapping"]
         self.mappingType = MappingType(imageConfig["mappingType"])
         self.width = int(imageConfig["width"])
@@ -51,16 +52,36 @@ class Application:
             # configurazione delle dimensioni e del numero di canali per il mapping
             ImageMappingStrategy.setImageSize(self.width, self.height, self.numberOfChannels)
 
-            # avvio lettura file PE e generazione immagini
+            # creazione oggetto per la conversione dei file PE in immagini
             peFile = PEFile()
+
+            # creazione oggetto per la gestione del file CSV contenente il mapping immagini-label
+            csvImageMapping = CSVImageMapping()
+
+            # lettura delle label dei file PE
+            labelMapping = csvImageMapping.loadLabels(self.labelsPath)
+
+            # creazione del file CSV contenente il mapping immagini-label
+            mappingFile, writer = csvImageMapping.createImageMapping(self.imageMapping)
 
             # lettura di tutti i file PE presenti nella cartella
             for fileName in os.listdir(self.filesPath):
-                
+
                 filePath = os.path.join(self.filesPath, fileName)
 
-                # conversione del file PE in immagine
-                peFile.PEToImage(filePath, self.imagePath, self.mappingType)
+                peFile.PEToImage(filePath, self.imagesPath, self.mappingType)
+
+                # recupero della label del file PE
+                label = labelMapping[fileName]
+
+                # path dell'immagine generata
+                imagePath = os.path.join(self.imagesPath, fileName + ".png")
+
+                # salvataggio del mapping immagine-label
+                csvImageMapping.addImageMapping(writer, imagePath, label)
+
+            # chiusura del file CSV
+            mappingFile.close()
 
         # esecuzione pipeline di training
         if self.trainEnabled == 1:
