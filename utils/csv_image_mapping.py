@@ -2,9 +2,9 @@ import csv
 
 class CSVImageMapping:
 
-    def loadLabels(self, labelsPath):
+    def loadLabelMapping(self, labelsPath):
 
-        labels = {}
+        labelMapping = {}
 
         # lettura del file CSV contenente le label dei file PE
         with open(labelsPath, "r", newline="") as file:
@@ -15,12 +15,12 @@ class CSVImageMapping:
             for row in reader:
 
                 if row["list"] == "Whitelist":
-                    labels[row["id"]] = 0
+                    labelMapping[row["id"]] = 0
 
                 elif row["list"] == "Blacklist":
-                    labels[row["id"]] = 1
+                    labelMapping[row["id"]] = 1
 
-        return labels
+        return labelMapping
 
     def createImageMapping(self, imageMapping):
 
