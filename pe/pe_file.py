@@ -8,30 +8,26 @@ from image_representation.image_mapping_strategy import ImageMappingStrategy
 
 class PEFile:
 
-    def read(self, filesPath, mappingType):
+    def PEToImage(self, filePath, imagePath, mappingType):
 
-        # lettura di tutti i file PE presenti nella cartella
-        for fileName in os.listdir(filesPath):
+        # apertura e lettura del file PE in modalità binaria
+        with open(filePath, "rb") as file:
+            byteData = file.read()
 
-            filePath = os.path.join(filesPath, fileName)
+        # selezione della strategia di mapping
+        if mappingType == MappingType.LINEAR:
+            strategy = LinearMapping()
 
-            # apertura e lettura del file PE in modalità binaria
-            with open(filePath, "rb") as file:
-                byteData = file.read()
+        elif mappingType == MappingType.ZIGZAG:
+            strategy = ZigZagMapping()
 
-            # selezione della strategia di mapping
-            if mappingType == MappingType.LINEAR:
-                strategy = LinearMapping()
+        elif mappingType == MappingType.SERPENTINE:
+            strategy = SerpentineMapping()
 
-            elif mappingType == MappingType.ZIGZAG:
-                strategy = ZigZagMapping()
+        # creazione dell'immagine a partire dai byte del file PE
+        image = strategy.createImage(byteData)
 
-            elif mappingType == MappingType.SERPENTINE:
-                strategy = SerpentineMapping()
-
-            # creazione dell'immagine a partire dai byte del file PE
-            image = strategy.createImage(byteData)
-
-            # salvataggio dell'immagine generata
-            outputPath = "images/" + fileName + ".png"
-            image.save(outputPath)
+        # salvataggio dell'immagine generata
+        fileName = os.path.basename(filePath)
+        outputImage = os.path.join(imagePath, fileName + ".png")
+        image.save(outputImage)

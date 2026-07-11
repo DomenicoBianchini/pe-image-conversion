@@ -1,4 +1,5 @@
 import configparser
+import os
 
 from pe.pe_file import PEFile
 from pe.mapping_type import MappingType
@@ -21,23 +22,23 @@ class Application:
 
         # parametri della parte di conversione PE -> immagini
         self.filesPath = imageConfig["filesPath"]
+        self.labelsPath = imageConfig["labelsPath"]
+        self.imagePath = imageConfig["imagePath"]
+        self.imageMapping = imageConfig["imageMapping"]
         self.mappingType = MappingType(imageConfig["mappingType"])
         self.width = int(imageConfig["width"])
         self.height = int(imageConfig["height"])
         self.numberOfChannels = int(imageConfig["numberOfChannels"])
 
-        # lettura configurazione della parte di dataset, DataLoader e ResNet
-        datasetConfig = config["DATASET_CONFIGURATION"]
+        # lettura configurazione della parte di training
+        trainConfig = config["TRAIN_CONFIGURATION"]
 
-        # flag per abilitare la parte di dataset, DataLoader e ResNet
-        self.datasetEnabled = int(datasetConfig["enabled"])
-
-        # path csv con mapping immagini-label
-        self.imageMapping = datasetConfig["imageMapping"]
+        # flag per abilitare la parte di training
+        self.trainEnabled = int(trainConfig["enabled"])
 
         # dimensioni del resize
-        self.resizeWidth = int(datasetConfig["resizeWidth"])
-        self.resizeHeight = int(datasetConfig["resizeHeight"])
+        self.resizeWidth = int(trainConfig["resizeWidth"])
+        self.resizeHeight = int(trainConfig["resizeHeight"])
 
     def main(self):
 
@@ -52,10 +53,17 @@ class Application:
 
             # avvio lettura file PE e generazione immagini
             peFile = PEFile()
-            peFile.read(self.filesPath, self.mappingType)
 
-        # esecuzione pipeline dataset, DataLoader e ResNet
-        if self.datasetEnabled == 1:
+            # lettura di tutti i file PE presenti nella cartella
+            for fileName in os.listdir(self.filesPath):
+                
+                filePath = os.path.join(self.filesPath, fileName)
+
+                # conversione del file PE in immagine
+                peFile.PEToImage(filePath, self.imagePath, self.mappingType)
+
+        # esecuzione pipeline di training
+        if self.trainEnabled == 1:
 
             # verifica se è necessario effettuare il resize delle immagini
             if self.resizeHeight != 0:
