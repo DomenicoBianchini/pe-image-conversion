@@ -1,8 +1,10 @@
 # dataset samples
-dataset/samples/
+dataset/train/samples/
+dataset/test/samples/
 
-# images
-images/
+# images generate
+dataset/train/images/
+dataset/test/images/
 
 # Python cache
 __pycache__/
