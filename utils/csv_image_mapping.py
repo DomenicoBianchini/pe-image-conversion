@@ -14,11 +14,7 @@ class CSVImageMapping:
             # salvataggio della label associata a ciascun file PE
             for row in reader:
 
-                if row["list"] == "Whitelist":
-                    labelMapping[row["id"]] = 0
-
-                elif row["list"] == "Blacklist":
-                    labelMapping[row["id"]] = 1
+                labelMapping[row["filename"]] = int(row["label"])
 
         return labelMapping
 

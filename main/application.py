@@ -58,7 +58,7 @@ class Application:
             # creazione oggetto per la gestione del file CSV contenente il mapping immagini-label
             csvImageMapping = CSVImageMapping()
 
-            # lettura del mapping file-label dal CSV originale
+            # lettura del mapping file-label dal CSV
             labelMapping = csvImageMapping.loadLabelMapping(self.labelsPath)
 
             # creazione del file CSV contenente il mapping immagini-label
