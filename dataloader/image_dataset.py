@@ -2,6 +2,7 @@ import pandas as pd
 import torch
 import torch.nn as nn
 from torchvision.io import read_image, ImageReadMode
+from torchvision.transforms import Normalize
 from torch.utils.data import Dataset
 
 class ImageDataset(Dataset):
@@ -29,6 +30,9 @@ class ImageDataset(Dataset):
 
             self.__upsample = nn.Upsample(size=(self.__resizeHeight, self.__resizeWidth), mode="bilinear", align_corners=True)
 
+        # normalizzazione per ResNet
+        self.__normalize = Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+
     def __len__(self):
 
         return len(self.__labels)
@@ -44,11 +48,17 @@ class ImageDataset(Dataset):
         # lettura diretta dell'immagine come tensore PyTorch
         image = read_image(imagePath, mode=ImageReadMode.RGB).float()
 
+        # conversione valori da 0-255 a 0-1
+        image = image / 255.0
+
         # resize dell'immagine se necessario
         if self.__needResize:
 
             image = image.unsqueeze(0)
             image = self.__upsample(image)
             image = image.squeeze(0)
+
+        # normalizzazione per ResNet
+        image = self.__normalize(image)
 
         return image, label

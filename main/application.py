@@ -1,5 +1,6 @@
 import configparser
 import os
+import numpy as np
 
 from utils.csv_image_mapping import CSVImageMapping
 from pe.pe_file import PEFile
@@ -31,15 +32,32 @@ class Application:
         self.height = int(imageConfig["height"])
         self.numberOfChannels = int(imageConfig["numberOfChannels"])
 
+        # dimensioni resize immagini
+        self.resizeWidth = int(imageConfig["resizeWidth"])
+        self.resizeHeight = int(imageConfig["resizeHeight"])
+
         # lettura configurazione della parte di training
         trainConfig = config["TRAIN_CONFIGURATION"]
 
         # flag per abilitare la parte di training
         self.trainEnabled = int(trainConfig["enabled"])
 
-        # dimensioni del resize
-        self.resizeWidth = int(trainConfig["resizeWidth"])
-        self.resizeHeight = int(trainConfig["resizeHeight"])
+        # parametri training
+        self.trainImageMapping = trainConfig["imageMapping"]
+        self.epochs = int(trainConfig["epochs"])
+        self.learningRate = float(trainConfig["learningRate"])
+        self.modelPath = trainConfig["modelPath"]
+
+        # lettura configurazione della parte di test
+        testConfig = config["TEST_CONFIGURATION"]
+
+        # flag per abilitare la parte di test
+        self.testEnabled = int(testConfig["enabled"])
+
+        # parametri test
+        self.testImageMapping = testConfig["imageMapping"]
+        self.testModelPath = testConfig["modelPath"]
+        self.confusionMatrixPath = testConfig["confusionMatrixPath"]
 
     def main(self):
 
@@ -83,24 +101,40 @@ class Application:
             # chiusura del file CSV
             mappingFile.close()
 
+        # verifica se è necessario effettuare il resize delle immagini
+        if self.resizeHeight != 0:
+            needResize = True
+        else:
+            needResize = False
+
         # esecuzione pipeline di training
         if self.trainEnabled == 1:
 
-            # verifica se è necessario effettuare il resize delle immagini
-            if self.resizeHeight != 0:
-                needResize = True
-            else:
-                needResize = False
-
-            # costruzione dataset e DataLoader
+            # costruzione DataLoader train e validation
             dataLoader = DataLoader()
-            imageDataloader = dataLoader.buildDataLoader(self.imageMapping, needResize, self.resizeWidth, self.resizeHeight)
+            trainLoader, validationLoader = dataLoader.buildTrainValidationLoader(self.trainImageMapping, needResize, self.resizeWidth, self.resizeHeight)
 
-            # ResNet modello preaddestrato
+            # creazione modello ResNet
             resnet = ResNetModel()
-            for images, labels in imageDataloader:
-                resnet.predict(images)
-                break
+
+            # avvio training
+            resnet.train(trainLoader, validationLoader, self.epochs, self.learningRate, self.modelPath)
+
+        # esecuzione pipeline di test
+        if self.testEnabled == 1:
+
+            # costruzione DataLoader test
+            dataLoader = DataLoader()
+            testLoader = dataLoader.buildTestLoader(self.testImageMapping, needResize, self.resizeWidth, self.resizeHeight)
+
+            # caricamento modello salvato
+            resnet = ResNetModel(self.testModelPath)
+
+            # esecuzione test
+            matrix = resnet.test(testLoader)
+
+            # salvataggio matrice di confusione
+            np.save(self.confusionMatrixPath, matrix)
 
 if __name__ == "__main__":
 

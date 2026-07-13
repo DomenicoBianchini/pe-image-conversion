@@ -1,28 +1,126 @@
 import torch
-from transformers import AutoImageProcessor, ResNetForImageClassification
+import torch.nn as nn
+from transformers import ResNetForImageClassification
+from sklearn.metrics import confusion_matrix
 
 class ResNetModel:
 
-    def __init__(self):
+    def __init__(self, modelPath=None):
 
-        # processor preaddestrato
-        self.__processor = AutoImageProcessor.from_pretrained("microsoft/resnet-50")
+        # device utilizzato dal modello
+        self.__device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-        # modello preaddestrato
-        self.__model = ResNetForImageClassification.from_pretrained("microsoft/resnet-50")
+        # caricamento modello
+        if modelPath is None:
+
+            self.__model = ResNetForImageClassification.from_pretrained("microsoft/resnet-50")
+
+            # modifica classificatore finale per due classi
+            self.__model.classifier = nn.Linear(self.__model.classifier.in_features, 2)
+
+        else:
+
+            self.__model = ResNetForImageClassification.from_pretrained(modelPath)
+
+        # spostamento modello sul device
+        self.__model.to(self.__device)
+
+    def train(self, trainLoader, validationLoader, epochs, learningRate, modelPath):
+
+        # funzione di loss
+        criterion = nn.CrossEntropyLoss()
+
+        # ottimizzatore
+        optimizer = torch.optim.Adam(self.__model.parameters(), lr=learningRate)
+
+        # valore iniziale per confronto validation loss
+        bestValidationLoss = float("inf")
+
+        for epoch in range(epochs):
+
+            # modalità training
+            self.__model.train()
+
+            for images, labels in trainLoader:
+
+                # spostamento dati sul device
+                images = images.to(self.__device)
+                labels = labels.to(self.__device)
+
+                # azzeramento gradienti
+                optimizer.zero_grad()
+
+                # forward pass
+                outputs = self.__model(images).logits
+
+                # calcolo loss
+                loss = criterion(outputs, labels)
+
+                # backward pass
+                loss.backward()
+
+                # aggiornamento pesi
+                optimizer.step()
+
+            # validation dopo ogni epoca
+            validationLoss = self.__validate(validationLoader, criterion)
+
+            # salvataggio modello migliore
+            if validationLoss < bestValidationLoss:
+
+                bestValidationLoss = validationLoss
+
+                torch.save(self.__model.state_dict(), modelPath)
+
+    def __validate(self, validationLoader, criterion):
 
         # modalità evaluation
         self.__model.eval()
 
-    def predict(self, images):
-
-        # preprocessing delle immagini
-        inputs = self.__processor(images, return_tensors="pt", do_resize=False, do_center_crop=False, do_rescale=True, do_normalize=True)
+        validationLoss = 0
 
         with torch.no_grad():
-            logits = self.__model(**inputs).logits
 
-        # predizioni delle label
-        predicted_indexes = logits.argmax(-1)
-        for idx in predicted_indexes:
-            print(self.__model.config.id2label[idx.item()])
+            for images, labels in validationLoader:
+
+                # spostamento dati sul device
+                images = images.to(self.__device)
+                labels = labels.to(self.__device)
+
+                # predizione
+                outputs = self.__model(images).logits
+
+                # calcolo loss
+                loss = criterion(outputs, labels)
+
+                validationLoss += loss.item()
+
+        return validationLoss / len(validationLoader)
+
+    def test(self, testLoader):
+
+        # modalità evaluation
+        self.__model.eval()
+
+        trueLabels = []
+        predictedLabels = []
+
+        with torch.no_grad():
+
+            for images, labels in testLoader:
+
+                # spostamento immagini sul device
+                images = images.to(self.__device)
+
+                # predizione
+                outputs = self.__model(images).logits
+
+                predictions = outputs.argmax(dim=1)
+
+                trueLabels.extend(labels.numpy())
+                predictedLabels.extend(predictions.cpu().numpy())
+
+        # creazione matrice di confusione
+        matrix = confusion_matrix(trueLabels, predictedLabels)
+
+        return matrix

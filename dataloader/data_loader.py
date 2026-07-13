@@ -1,25 +1,34 @@
 import torch
-import torch.utils.data
+from torch.utils.data import random_split
 from dataloader.image_dataset import ImageDataset
 
 class DataLoader:
 
-    def buildDataLoader(self, imageMapping, needResize, resizeWidth, resizeHeight):
+    def buildTrainValidationLoader(self, imageMapping, needResize, resizeWidth, resizeHeight):
 
-        # creazione dataset partendo dal CSV con imagePath e label
+        # creazione dataset completo del training
         dataset = ImageDataset(imageMapping, needResize, resizeWidth, resizeHeight)
 
-        # creazione DataLoader PyTorch
-        dataLoader = torch.utils.data.DataLoader(dataset, batch_size=32, shuffle=True)
+        # divisione dataset in train e validation
+        validationSize = int(0.2 * len(dataset))
+        trainSize = len(dataset) - validationSize
 
-        # stampa controllo numero campioni
-        print("Numero di campioni:", len(dataset))
+        trainDataset, validationDataset = random_split(dataset, [trainSize, validationSize])
 
-        # stampa controllo dimensioni batch
-        for images, labels in dataLoader:
+        # creazione DataLoader del training
+        trainLoader = torch.utils.data.DataLoader(trainDataset, batch_size=32, shuffle=True)
 
-            print("Batch immagini:", images.shape)
-            print("Batch label:", labels.shape)
-            break
+        # creazione DataLoader della validation
+        validationLoader = torch.utils.data.DataLoader(validationDataset, batch_size=32, shuffle=False)
 
-        return dataLoader
+        return trainLoader, validationLoader
+
+    def buildTestLoader(self, imageMapping, needResize, resizeWidth, resizeHeight):
+
+        # creazione dataset del test
+        dataset = ImageDataset(imageMapping, needResize, resizeWidth, resizeHeight)
+
+        # creazione DataLoader del test
+        testLoader = torch.utils.data.DataLoader(dataset, batch_size=32, shuffle=False)
+
+        return testLoader
