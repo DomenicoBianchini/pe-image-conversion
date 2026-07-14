@@ -16,12 +16,16 @@ pip install -r requirements.txt
 
 ## Configurazione
 
-Il progetto utilizza un unico file di configurazione (`config.ini`), suddiviso in due sezioni:
+Il progetto utilizza un unico file di configurazione (`config.ini`), suddiviso in tre sezioni:
 
 - `IMAGE_CONFIGURATION`  
-  Configura la fase di conversione dei file PE in immagini (cartella dei file PE, strategia di mapping, dimensioni dell'immagine e numero di canali).  
+  Configura la fase di conversione dei file PE in immagini (cartella dei file PE, file CSV con le label, cartella di salvataggio delle immagini, file CSV di mapping immagini-label, strategia di mapping, dimensioni dell'immagine e il numero di canali).  
   Include inoltre un parametro `enabled` che abilita o disabilita l'esecuzione di questa fase della pipeline.
 
-- `DATASET_CONFIGURATION`  
-  Configura la fase di costruzione del dataset e del DataLoader per ResNet (path del file CSV contenente il mapping immagini-label e parametri per il resize delle immagini).  
+- `TRAIN_CONFIGURATION`  
+  Configura la fase di training della ResNet (file CSV contenente il mapping immagini-label del training, numero di epoche, learning rate e il percorso dove salvare il modello migliore).  
+  Include inoltre un parametro `enabled` che abilita o disabilita l'esecuzione di questa fase della pipeline.
+
+- `TEST_CONFIGURATION`  
+  Configura la fase di test della ResNet (file CSV contenente il mapping immagini-label del test, percorso del modello salvato durante il training e il percorso dove salvare la matrice di confusione).  
   Include inoltre un parametro `enabled` che abilita o disabilita l'esecuzione di questa fase della pipeline.
