@@ -9,7 +9,6 @@ class ResNetModel:
 
         # device utilizzato dal modello
         self.__device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        print("Device utilizzato:", self.__device)
 
         # caricamento modello
         if modelPath is None:
