@@ -4,10 +4,10 @@ from dataloader.image_dataset import ImageDataset
 
 class DataLoader:
 
-    def buildTrainValidationLoader(self, imageMapping, needResize, resizeWidth, resizeHeight):
+    def buildTrainValidationLoader(self, trainImageMapping, needResize, resizeWidth, resizeHeight):
 
         # creazione dataset completo del training
-        dataset = ImageDataset(imageMapping, needResize, resizeWidth, resizeHeight)
+        dataset = ImageDataset(trainImageMapping, needResize, resizeWidth, resizeHeight)
 
         # divisione dataset in train e validation
         validationSize = int(0.2 * len(dataset))
@@ -23,10 +23,10 @@ class DataLoader:
 
         return trainLoader, validationLoader
 
-    def buildTestLoader(self, imageMapping, needResize, resizeWidth, resizeHeight):
+    def buildTestLoader(self, testImageMapping, needResize, resizeWidth, resizeHeight):
 
         # creazione dataset del test
-        dataset = ImageDataset(imageMapping, needResize, resizeWidth, resizeHeight)
+        dataset = ImageDataset(testImageMapping, needResize, resizeWidth, resizeHeight)
 
         # creazione DataLoader del test
         testLoader = torch.utils.data.DataLoader(dataset, batch_size=32, shuffle=False)
