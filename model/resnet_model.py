@@ -9,6 +9,7 @@ class ResNetModel:
 
         # device utilizzato dal modello
         self.__device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        print("Device utilizzato:", self.__device)
 
         # caricamento modello
         if modelPath is None:
@@ -37,6 +38,7 @@ class ResNetModel:
 
             # modalità training
             self.__model.train()
+            trainLoss = 0.0
 
             for images, labels in trainLoader:
 
@@ -59,22 +61,28 @@ class ResNetModel:
                 # aggiornamento pesi
                 optimizer.step()
 
+                # accumulo loss del batch
+                trainLoss += loss.item() * images.size(0)
+
+            # media della loss di training
+            trainLoss /= len(trainLoader.dataset)
+
             # validation dopo ogni epoca
             validationLoss = self.__validate(validationLoader, criterion)
+
+            print("Epoca:", epoch + 1, "Train Loss:", trainLoss, "Validation Loss:", validationLoss)
 
             # salvataggio modello migliore
             if validationLoss < bestValidationLoss:
 
                 bestValidationLoss = validationLoss
-
                 self.__model.save_pretrained(modelPath)
 
     def __validate(self, validationLoader, criterion):
 
         # modalità evaluation
         self.__model.eval()
-
-        validationLoss = 0
+        validationLoss = 0.0
 
         with torch.no_grad():
 
@@ -89,10 +97,11 @@ class ResNetModel:
 
                 # calcolo loss
                 loss = criterion(outputs, labels)
+                validationLoss += loss.item() * images.size(0)
 
-                validationLoss += loss.item()
+        validationLoss /= len(validationLoader.dataset)
 
-        return validationLoss / len(validationLoader)
+        return validationLoss
 
     def test(self, testLoader):
 
@@ -111,10 +120,8 @@ class ResNetModel:
 
                 # predizione
                 outputs = self.__model(images).logits
-
                 predictions = outputs.argmax(dim=1)
-
-                trueLabels.extend(labels.numpy())
+                trueLabels.extend(labels.cpu().numpy())
                 predictedLabels.extend(predictions.cpu().numpy())
 
         # creazione matrice di confusione
