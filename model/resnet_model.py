@@ -13,7 +13,13 @@ class ResNetModel:
         # caricamento modello
         if modelPath is None:
 
-            self.__model = ResNetForImageClassification.from_pretrained("microsoft/resnet-50", num_labels=2, ignore_mismatched_sizes=True)
+            self.__model = ResNetForImageClassification.from_pretrained(
+                "microsoft/resnet-50",
+                num_labels=2,
+                id2label={0: "goodware", 1: "malware"},
+                label2id={"goodware": 0, "malware": 1},
+                ignore_mismatched_sizes=True
+            )
 
         else:
 
@@ -69,7 +75,7 @@ class ResNetModel:
             # validation dopo ogni epoca
             validationLoss = self.__validate(validationLoader, criterion)
 
-            print("Epoca:", epoch + 1, "Train Loss:", trainLoss, "Validation Loss:", validationLoss)
+            print(f"Epoca: {epoch + 1} | Train Loss: {trainLoss:.4f} | Validation Loss: {validationLoss:.4f}")
 
             # salvataggio modello migliore
             if validationLoss < bestValidationLoss:
