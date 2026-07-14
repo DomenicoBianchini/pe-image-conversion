@@ -1,5 +1,7 @@
 numpy
 Pillow
 pandas
-torchvision
 torch
+torchvision
+transformers
+scikit-learn
