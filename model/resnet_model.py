@@ -13,10 +13,7 @@ class ResNetModel:
         # caricamento modello
         if modelPath is None:
 
-            self.__model = ResNetForImageClassification.from_pretrained("microsoft/resnet-50")
-
-            # modifica classificatore finale per due classi
-            self.__model.classifier = nn.Linear(self.__model.classifier.in_features, 2)
+            self.__model = ResNetForImageClassification.from_pretrained("microsoft/resnet-50", num_labels=2, ignore_mismatched_sizes=True)
 
         else:
 
@@ -70,7 +67,7 @@ class ResNetModel:
 
                 bestValidationLoss = validationLoss
 
-                torch.save(self.__model.state_dict(), modelPath)
+                self.__model.save_pretrained(modelPath)
 
     def __validate(self, validationLoader, criterion):
 
