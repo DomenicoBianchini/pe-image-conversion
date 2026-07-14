@@ -4,15 +4,19 @@ from PIL import Image as PILImage
 class Image:
 
     def __init__(self, data):
+
         self.__data = data
 
     def getWidth(self):
+
         return self.__data.shape[1]
 
     def getHeight(self):
+
         return self.__data.shape[0]
 
     def getNumberOfChannels(self):
+
         return self.__data.shape[2]
 
     def save(self, fileName):
