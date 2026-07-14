@@ -1,6 +1,8 @@
 import configparser
 import os
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 from utils.csv_image_mapping import CSVImageMapping
 from pe.pe_file import PEFile
@@ -134,7 +136,13 @@ class Application:
             matrix = resnet.test(testLoader)
 
             # salvataggio matrice di confusione
-            np.save(self.confusionMatrixPath, matrix)
+            sns.heatmap(matrix, annot=True, fmt="d", cmap="Blues",
+                        cbar=False, xticklabels=["Goodware", "Malware"],
+                        yticklabels=["Goodware", "Malware"])
+            plt.xlabel("Predicted")
+            plt.ylabel("Actual")
+            plt.title("Confusion Matrix")
+            plt.savefig(self.confusionMatrixPath)
 
 if __name__ == "__main__":
 
