@@ -1,6 +1,5 @@
 import configparser
 import os
-import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -22,7 +21,7 @@ class Application:
         imageConfig = config["IMAGE_CONFIGURATION"]
 
         # flag per abilitare la parte di conversione PE -> immagini
-        self.peEnabled = int(imageConfig["enabled"])
+        self.peEnabled = imageConfig["enabled"] == "1"
 
         # parametri della parte di conversione PE -> immagini
         self.filesPath = imageConfig["filesPath"]
@@ -42,7 +41,7 @@ class Application:
         trainConfig = config["TRAIN_CONFIGURATION"]
 
         # flag per abilitare la parte di training
-        self.trainEnabled = int(trainConfig["enabled"])
+        self.trainEnabled = trainConfig["enabled"] == "1"
 
         # parametri training
         self.trainImageMapping = trainConfig["imageMapping"]
@@ -54,7 +53,7 @@ class Application:
         testConfig = config["TEST_CONFIGURATION"]
 
         # flag per abilitare la parte di test
-        self.testEnabled = int(testConfig["enabled"])
+        self.testEnabled = testConfig["enabled"] == "1"
 
         # parametri test
         self.testImageMapping = testConfig["imageMapping"]
@@ -67,7 +66,7 @@ class Application:
         self.__parseConfig("config.ini")
 
         # esecuzione pipeline conversione PE
-        if self.peEnabled == 1:
+        if self.peEnabled:
 
             # configurazione delle dimensioni e del numero di canali per il mapping
             ImageMappingStrategy.setImageSize(self.width, self.height, self.numberOfChannels)
@@ -110,7 +109,7 @@ class Application:
             needResize = False
 
         # esecuzione pipeline di training
-        if self.trainEnabled == 1:
+        if self.trainEnabled:
 
             # costruzione DataLoader train e validation
             dataLoader = DataLoader()
@@ -123,7 +122,7 @@ class Application:
             resnet.train(trainLoader, validationLoader, self.epochs, self.learningRate, self.modelPath)
 
         # esecuzione pipeline di test
-        if self.testEnabled == 1:
+        if self.testEnabled:
 
             # costruzione DataLoader test
             dataLoader = DataLoader()
