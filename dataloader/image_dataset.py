@@ -7,10 +7,10 @@ from torch.utils.data import Dataset
 
 class ImageDataset(Dataset):
 
-    def __init__(self, imageMapping, needResize, resizeWidth, resizeHeight):
+    def __init__(self, imageLabelsPath, needResize, resizeWidth, resizeHeight):
 
         # lettura del file CSV con imagePath e label
-        data = pd.read_csv(imageMapping)
+        data = pd.read_csv(imageLabelsPath)
 
         # salvataggio dei path delle immagini in un array
         self.__images = data["imagePath"].values

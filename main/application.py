@@ -3,7 +3,7 @@ import os
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from utils.csv_image_mapping import CSVImageMapping
+from utils.label_dictionary import LabelDictionary
 from pe.pe_file import PEFile
 from pe.mapping_type import MappingType
 from image_representation.image_mapping_strategy import ImageMappingStrategy
@@ -27,7 +27,7 @@ class Application:
         self.filesPath = imageConfig["filesPath"]
         self.labelsPath = imageConfig["labelsPath"]
         self.imagesPath = imageConfig["imagesPath"]
-        self.imageMapping = imageConfig["imageMapping"]
+        self.imageLabelsPath = imageConfig["imageLabelsPath"]
         self.mappingType = MappingType(imageConfig["mappingType"])
         self.width = int(imageConfig["width"])
         self.height = int(imageConfig["height"])
@@ -44,7 +44,7 @@ class Application:
         self.trainEnabled = trainConfig["enabled"] == "1"
 
         # parametri training
-        self.trainImageMapping = trainConfig["imageMapping"]
+        self.trainImageLabelsPath = trainConfig["imageLabelsPath"]
         self.epochs = int(trainConfig["epochs"])
         self.learningRate = float(trainConfig["learningRate"])
         self.modelPath = trainConfig["modelPath"]
@@ -56,7 +56,7 @@ class Application:
         self.testEnabled = testConfig["enabled"] == "1"
 
         # parametri test
-        self.testImageMapping = testConfig["imageMapping"]
+        self.testImageLabelsPath = testConfig["imageLabelsPath"]
         self.testModelPath = testConfig["modelPath"]
         self.confusionMatrixPath = testConfig["confusionMatrixPath"]
 
@@ -74,33 +74,24 @@ class Application:
             # creazione oggetto per la conversione dei file PE in immagini
             peFile = PEFile()
 
-            # creazione oggetto per la gestione del file CSV contenente il mapping immagini-label
-            csvImageMapping = CSVImageMapping()
-
-            # lettura del mapping file-label dal CSV
-            labelMapping = csvImageMapping.loadLabelMapping(self.labelsPath)
-
-            # creazione del file CSV contenente il mapping immagini-label
-            mappingFile, writer = csvImageMapping.createImageMapping(self.imageMapping)
+            # creazione oggetto per la gestione delle label e del mapping immagini-label
+            labelDictionary = LabelDictionary(self.labelsPath)
 
             # lettura di tutti i file PE presenti nella cartella
             for fileName in os.listdir(self.filesPath):
-
                 filePath = os.path.join(self.filesPath, fileName)
 
+                # conversione del file PE in immagine
                 peFile.PEToImage(filePath, self.imagesPath, self.mappingType)
-
-                # recupero della label del file PE
-                label = labelMapping[fileName]
 
                 # path dell'immagine generata
                 imagePath = os.path.join(self.imagesPath, fileName + ".png")
 
-                # salvataggio del mapping immagine-label
-                csvImageMapping.addImageMapping(writer, imagePath, label)
+                # aggiunta del path dell'immagine e della sua label al dizionario
+                labelDictionary.addLabelImage(fileName, imagePath)
 
-            # chiusura del file CSV
-            mappingFile.close()
+            # salvataggio del CSV contenente il mapping fra il path delle immagini e le relative label
+            labelDictionary.save(self.imageLabelsPath)
 
         # verifica se è necessario effettuare il resize delle immagini
         if self.resizeHeight != 0:
@@ -113,7 +104,7 @@ class Application:
 
             # costruzione DataLoader train e validation
             dataLoader = DataLoader()
-            trainLoader, validationLoader = dataLoader.buildTrainValidationLoader(self.trainImageMapping, needResize, self.resizeWidth, self.resizeHeight)
+            trainLoader, validationLoader = dataLoader.buildTrainValidationLoader(self.trainImageLabelsPath, needResize, self.resizeWidth, self.resizeHeight)
 
             # creazione modello ResNet
             resnet = ResNetModel()
@@ -126,7 +117,7 @@ class Application:
 
             # costruzione DataLoader test
             dataLoader = DataLoader()
-            testLoader = dataLoader.buildTestLoader(self.testImageMapping, needResize, self.resizeWidth, self.resizeHeight)
+            testLoader = dataLoader.buildTestLoader(self.testImageLabelsPath, needResize, self.resizeWidth, self.resizeHeight)
 
             # caricamento modello salvato
             resnet = ResNetModel(self.testModelPath)
