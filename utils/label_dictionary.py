@@ -8,7 +8,7 @@ class LabelDictionary:
         self.__labelDictionary = {}
 
         # dizionario che associa il path dell'immagine alla sua label
-        self.__imageDictionary = {}
+        self.__imageLabelDictionary = {}
 
         # lettura del file CSV contenente le label dei file PE
         with open(labelsPath, "r", newline="") as file:
@@ -26,7 +26,7 @@ class LabelDictionary:
         label = self.__labelDictionary[fileName]
 
         # aggiunta del path dell'immagine e della sua label al dizionario
-        self.__imageDictionary[imagePath] = label
+        self.__imageLabelDictionary[imagePath] = label
 
     def save(self, imageLabelsPath):
 
@@ -38,5 +38,5 @@ class LabelDictionary:
             writer.writerow(["imagePath", "label"])
 
             # scrittura del mapping del path dell'immagine e della sua label nel file CSV
-            for imagePath, label in self.__imageDictionary.items():
+            for imagePath, label in self.__imageLabelDictionary.items():
                 writer.writerow([imagePath, label])
