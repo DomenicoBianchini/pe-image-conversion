@@ -1,8 +1,7 @@
 import configparser
 import os
-import matplotlib.pyplot as plt
-import seaborn as sns
 
+from utils.classification_metrics import ClassificationMetrics
 from utils.label_dictionary import LabelDictionary
 from pe.pe_file import PEFile
 from pe.mapping_type import MappingType
@@ -58,7 +57,7 @@ class Application:
         # parametri test
         self.testImageLabelsPath = testConfig["imageLabelsPath"]
         self.testModelPath = testConfig["modelPath"]
-        self.confusionMatrixPath = testConfig["confusionMatrixPath"]
+        self.resultsPath = testConfig["resultsPath"]
 
     def main(self):
 
@@ -122,17 +121,17 @@ class Application:
             # caricamento modello salvato
             resnet = ResNetModel(self.testModelPath)
 
-            # esecuzione test
+            # esecuzione del test
             matrix = resnet.test(testLoader)
 
-            # salvataggio matrice di confusione
-            sns.heatmap(matrix, annot=True, fmt="d", cmap="Blues",
-                        cbar=False, xticklabels=["Goodware", "Malware"],
-                        yticklabels=["Goodware", "Malware"])
-            plt.xlabel("Predicted")
-            plt.ylabel("Actual")
-            plt.title("Confusion Matrix")
-            plt.savefig(self.confusionMatrixPath)
+            # creazione oggetto per il calcolo delle metriche
+            classificationMetrics = ClassificationMetrics(matrix)
+
+            # calcolo delle metriche
+            classificationMetrics.calculateMetrics()
+
+            # salvataggio dei risultati del test con le metriche calcolate in un file CSV
+            classificationMetrics.save(self.resultsPath, self.mappingType, self.width, self.height, self.numberOfChannels, self.epochs, self.learningRate)
 
 if __name__ == "__main__":
 
