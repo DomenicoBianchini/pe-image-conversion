@@ -87,10 +87,10 @@ class ClassificationMetrics:
                 self.__falsePositive,
                 self.__falseNegative,
                 self.__truePositive,
-                self.__precisionGoodware,
-                self.__recallGoodware,
-                self.__f1Goodware,
-                self.__precisionMalware,
-                self.__recallMalware,
-                self.__f1Malware
+                round(self.__precisionGoodware, 4),
+                round(self.__recallGoodware, 4),
+                round(self.__f1Goodware, 4),
+                round(self.__precisionMalware, 4),
+                round(self.__recallMalware, 4),
+                round(self.__f1Malware, 4)
             ])
