@@ -108,8 +108,26 @@ class Application:
             # creazione modello ResNet
             resnet = ResNetModel()
 
+            # costruzione del nome delle dimensioni
+            if self.height == 0:
+                imageSize = str(self.width) + "xVARIABLE"
+            else:
+                imageSize = str(self.width) + "x" + str(self.height)
+
+            # identificazione del numero di canali
+            if self.numberOfChannels == 1:
+                channels = "GRAY"
+            else:
+                channels = "RGB"
+
+            # costruzione del nome della configurazione
+            configurationName = self.mappingType.value + "_" + imageSize + "_" + channels
+
+            # costruzione del path del modello
+            modelPath = os.path.join(self.modelPath, configurationName)
+
             # avvio training
-            resnet.train(trainLoader, validationLoader, self.epochs, self.learningRate, self.modelPath)
+            resnet.train(trainLoader, validationLoader, self.epochs, self.learningRate, modelPath)
 
         # esecuzione pipeline di test
         if self.testEnabled:
