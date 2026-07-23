@@ -1,4 +1,5 @@
 import configparser
+import json
 import os
 
 from utils.classification_metrics import ClassificationMetrics
@@ -78,6 +79,7 @@ class Application:
 
             # lettura di tutti i file PE presenti nella cartella
             for fileName in os.listdir(self.filesPath):
+
                 filePath = os.path.join(self.filesPath, fileName)
 
                 # conversione del file PE in immagine
@@ -120,14 +122,17 @@ class Application:
             else:
                 channels = "RGB"
 
-            # costruzione del nome della configurazione
+            # costruzione del nome della configurazione delle immagini
             configurationName = self.mappingType.value + "_" + imageSize + "_" + channels
 
+            # costruzione del nome della configurazione del training
+            trainingName = "EPOCHS_" + str(self.epochs) + "_LR_" + str(self.learningRate)
+
             # costruzione del path del modello
-            modelPath = os.path.join(self.modelPath, configurationName)
+            modelPath = os.path.join(self.modelPath, configurationName, trainingName)
 
             # avvio training
-            resnet.train(trainLoader, validationLoader, self.epochs, self.learningRate, modelPath)
+            resnet.train(trainLoader, validationLoader, self.epochs, self.learningRate, modelPath, self.mappingType.value, self.width, self.height, self.numberOfChannels, self.resizeWidth, self.resizeHeight)
 
         # esecuzione pipeline di test
         if self.testEnabled:
@@ -148,8 +153,25 @@ class Application:
             # calcolo delle metriche
             classificationMetrics.calculateMetrics()
 
-            # salvataggio dei risultati del test con le metriche calcolate in un file CSV
-            classificationMetrics.save(self.resultsPath, self.mappingType, self.width, self.height, self.numberOfChannels, self.epochs, self.learningRate)
+            # lettura della configurazione utilizzata per il training del modello
+            configurationPath = os.path.join(self.testModelPath, "training_configuration.json")
+
+            with open(configurationPath, "r") as file:
+                configuration = json.load(file)
+
+            # salvataggio dei risultati del test con la configurazione del modello testato
+            classificationMetrics.save(
+                self.resultsPath,
+                configuration["mappingType"],
+                configuration["width"],
+                configuration["height"],
+                configuration["numberOfChannels"],
+                configuration["resizeWidth"],
+                configuration["resizeHeight"],
+                configuration["epochs"],
+                configuration["learningRate"]
+            )
+
 
 if __name__ == "__main__":
 

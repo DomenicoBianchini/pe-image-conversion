@@ -1,3 +1,6 @@
+import json
+import os
+
 import torch
 import torch.nn as nn
 from transformers import ResNetForImageClassification
@@ -28,7 +31,7 @@ class ResNetModel:
         # spostamento modello sul device
         self.__model.to(self.__device)
 
-    def train(self, trainLoader, validationLoader, epochs, learningRate, modelPath):
+    def train(self, trainLoader, validationLoader, epochs, learningRate, modelPath, mappingType, width, height, numberOfChannels, resizeWidth, resizeHeight):
 
         # funzione di loss
         criterion = nn.CrossEntropyLoss()
@@ -81,7 +84,28 @@ class ResNetModel:
             if validationLoss < bestValidationLoss:
 
                 bestValidationLoss = validationLoss
+
+                # salvataggio del modello
                 self.__model.save_pretrained(modelPath)
+
+                # configurazione utilizzata per il training
+                configuration = {
+                    "mappingType": mappingType,
+                    "width": width,
+                    "height": height,
+                    "numberOfChannels": numberOfChannels,
+                    "resizeWidth": resizeWidth,
+                    "resizeHeight": resizeHeight,
+                    "epochs": epochs,
+                    "learningRate": learningRate
+                }
+
+                # path del file contenente la configurazione
+                configurationPath = os.path.join(modelPath, "training_configuration.json")
+
+                # salvataggio della configurazione
+                with open(configurationPath, "w") as file:
+                    json.dump(configuration, file, indent=4)
 
     def __validate(self, validationLoader, criterion):
 
@@ -126,6 +150,7 @@ class ResNetModel:
                 # predizione
                 outputs = self.__model(images).logits
                 predictions = outputs.argmax(dim=1)
+
                 trueLabels.extend(labels.cpu().numpy())
                 predictedLabels.extend(predictions.cpu().numpy())
 
