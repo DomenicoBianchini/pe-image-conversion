@@ -99,7 +99,7 @@ class Application:
             needResize = False
         else:
             needResize = True
-            
+
         # esecuzione pipeline di training
         if self.trainEnabled:
 
@@ -138,7 +138,26 @@ class Application:
             modelPath = os.path.join(self.modelPath, configurationName, trainingName)
 
             # avvio training
-            resnet.train(trainLoader, validationLoader, self.epochs, self.learningRate, modelPath, self.mappingType.value, self.width, self.height, self.numberOfChannels, self.resizeWidth, self.resizeHeight)
+            resnet.train(trainLoader, validationLoader, self.epochs, self.learningRate, modelPath)
+
+            # configurazione utilizzata per il training
+            configuration = {
+                "mappingType": self.mappingType.value,
+                "width": self.width,
+                "height": self.height,
+                "numberOfChannels": self.numberOfChannels,
+                "resizeWidth": self.resizeWidth,
+                "resizeHeight": self.resizeHeight,
+                "epochs": self.epochs,
+                "learningRate": self.learningRate
+            }
+
+            # path del file contenente la configurazione
+            configurationPath = os.path.join(modelPath, "training_configuration.json")
+
+            # salvataggio della configurazione
+            with open(configurationPath, "w") as file:
+                json.dump(configuration, file, indent=4)
 
         # esecuzione pipeline di test
         if self.testEnabled:
