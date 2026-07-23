@@ -95,11 +95,11 @@ class Application:
             labelDictionary.save(self.imageLabelsPath)
 
         # verifica se è necessario effettuare il resize delle immagini
-        if self.resizeHeight != 0:
-            needResize = True
-        else:
+        if self.resizeWidth == 0 or self.resizeHeight == 0:
             needResize = False
-
+        else:
+            needResize = True
+            
         # esecuzione pipeline di training
         if self.trainEnabled:
 
@@ -125,8 +125,14 @@ class Application:
             # costruzione del nome della configurazione delle immagini
             configurationName = self.mappingType.value + "_" + imageSize + "_" + channels
 
+            # costruzione del nome della configurazione del resize
+            if self.resizeWidth == 0 or self.resizeHeight == 0:
+                resizeName = "NO_RESIZE"
+            else:
+                resizeName = "RESIZE_" + str(self.resizeWidth) + "x" + str(self.resizeHeight)
+
             # costruzione del nome della configurazione del training
-            trainingName = "EPOCHS_" + str(self.epochs) + "_LR_" + str(self.learningRate)
+            trainingName = "EPOCHS_" + str(self.epochs) + "_LR_" + str(self.learningRate) + "_" + resizeName
 
             # costruzione del path del modello
             modelPath = os.path.join(self.modelPath, configurationName, trainingName)
