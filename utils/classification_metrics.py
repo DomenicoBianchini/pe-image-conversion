@@ -36,7 +36,7 @@ class ClassificationMetrics:
         # calcolo della F1-score per la classe malware
         self.__f1Malware = 2 * self.__precisionMalware * self.__recallMalware / (self.__precisionMalware + self.__recallMalware)
 
-    def save(self, resultsPath, mappingType, width, height, numberOfChannels, resizeWidth, resizeHeight, epochs, learningRate):
+    def save(self, resultsPath, configuration):
 
         # verifica se la cartella del file CSV esiste
         directory = os.path.dirname(resultsPath)
@@ -79,14 +79,14 @@ class ClassificationMetrics:
 
             # scrittura dei risultati della configurazione
             writer.writerow([
-                mappingType,
-                width,
-                height,
-                numberOfChannels,
-                resizeWidth,
-                resizeHeight,
-                epochs,
-                learningRate,
+                configuration["mappingType"],
+                configuration["width"],
+                configuration["height"],
+                configuration["numberOfChannels"],
+                configuration["resizeWidth"],
+                configuration["resizeHeight"],
+                configuration["epochs"],
+                configuration["learningRate"],
                 self.__trueNegative,
                 self.__falsePositive,
                 self.__falseNegative,

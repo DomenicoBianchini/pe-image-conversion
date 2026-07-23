@@ -185,17 +185,7 @@ class Application:
                 configuration = json.load(file)
 
             # salvataggio dei risultati del test con la configurazione del modello testato
-            classificationMetrics.save(
-                self.resultsPath,
-                configuration["mappingType"],
-                configuration["width"],
-                configuration["height"],
-                configuration["numberOfChannels"],
-                configuration["resizeWidth"],
-                configuration["resizeHeight"],
-                configuration["epochs"],
-                configuration["learningRate"]
-            )
+            classificationMetrics.save(self.resultsPath, configuration)
 
 
 if __name__ == "__main__":
