@@ -12,11 +12,11 @@ class ImageDataset(Dataset):
         # lettura del file CSV con imagePath e label
         data = pd.read_csv(imageLabelsPath)
 
-        # salvataggio dei path delle immagini in un array
-        self.__images = data["imagePath"].values
+        # salvataggio dei path delle immagini in una lista
+        self.__images = data["imagePath"].tolist()
 
-        # conversione label in tensori PyTorch
-        self.__labels = torch.tensor(data["label"].values, dtype=torch.long)
+        # salvataggio delle label in una lista
+        self.__labels = data["label"].tolist()
 
         # flag per indicare se serve resize
         self.__needResize = needResize
@@ -43,7 +43,7 @@ class ImageDataset(Dataset):
         imagePath = self.__images[index]
 
         # recupero label corrispondente
-        label = self.__labels[index]
+        label = torch.tensor(self.__labels[index], dtype=torch.long)
 
         # lettura diretta dell'immagine come tensore PyTorch
         image = read_image(imagePath, mode=ImageReadMode.RGB).float()
