@@ -16,10 +16,22 @@ class DataLoader:
         trainDataset, validationDataset = random_split(dataset, [trainSize, validationSize])
 
         # creazione DataLoader del training
-        trainLoader = torch.utils.data.DataLoader(trainDataset, batch_size=32, shuffle=True)
+        trainLoader = torch.utils.data.DataLoader(
+            trainDataset,
+            batch_size=32,
+            shuffle=True,
+            num_workers=4,
+            pin_memory=True
+        )
 
         # creazione DataLoader della validation
-        validationLoader = torch.utils.data.DataLoader(validationDataset, batch_size=32, shuffle=False)
+        validationLoader = torch.utils.data.DataLoader(
+            validationDataset,
+            batch_size=32,
+            shuffle=False,
+            num_workers=4,
+            pin_memory=True
+        )
 
         return trainLoader, validationLoader
 
@@ -29,6 +41,12 @@ class DataLoader:
         dataset = ImageDataset(imageLabelsPath, needResize, resizeWidth, resizeHeight)
 
         # creazione DataLoader del test
-        testLoader = torch.utils.data.DataLoader(dataset, batch_size=32, shuffle=False)
+        testLoader = torch.utils.data.DataLoader(
+            dataset,
+            batch_size=32,
+            shuffle=False,
+            num_workers=4,
+            pin_memory=True
+        )
 
         return testLoader

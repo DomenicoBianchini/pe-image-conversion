@@ -25,6 +25,13 @@ class ResNetModel:
 
             self.__model = ResNetForImageClassification.from_pretrained(modelPath)
 
+        # utilizzo di tutte le GPU disponibili
+        if torch.cuda.device_count() > 1:
+
+            print("GPU disponibili:", torch.cuda.device_count())
+
+            self.__model = nn.DataParallel(self.__model)
+
         # spostamento modello sul device
         self.__model.to(self.__device)
 
@@ -45,11 +52,11 @@ class ResNetModel:
             self.__model.train()
             trainLoss = 0.0
 
-            for images, labels in trainLoader:
+            for batch, (images, labels) in enumerate(trainLoader, start=1):
 
                 # spostamento dati sul device
-                images = images.to(self.__device)
-                labels = labels.to(self.__device)
+                images = images.to(self.__device, non_blocking=True)
+                labels = labels.to(self.__device, non_blocking=True)
 
                 # azzeramento gradienti
                 optimizer.zero_grad()
@@ -69,6 +76,10 @@ class ResNetModel:
                 # accumulo loss del batch
                 trainLoss += loss.item() * images.size(0)
 
+                if batch % 1000 == 0:
+
+                    print(f"Epoca: {epoch + 1} | Batch: {batch}/{len(trainLoader)}")
+
             # media della loss di training
             trainLoss /= len(trainLoader.dataset)
 
@@ -83,7 +94,13 @@ class ResNetModel:
                 bestValidationLoss = validationLoss
 
                 # salvataggio del modello
-                self.__model.save_pretrained(modelPath)
+                if isinstance(self.__model, nn.DataParallel):
+
+                    self.__model.module.save_pretrained(modelPath)
+
+                else:
+
+                    self.__model.save_pretrained(modelPath)
 
     def __validate(self, validationLoader, criterion):
 
@@ -96,8 +113,8 @@ class ResNetModel:
             for images, labels in validationLoader:
 
                 # spostamento dati sul device
-                images = images.to(self.__device)
-                labels = labels.to(self.__device)
+                images = images.to(self.__device, non_blocking=True)
+                labels = labels.to(self.__device, non_blocking=True)
 
                 # predizione
                 outputs = self.__model(images).logits
@@ -123,7 +140,7 @@ class ResNetModel:
             for images, labels in testLoader:
 
                 # spostamento immagini sul device
-                images = images.to(self.__device)
+                images = images.to(self.__device, non_blocking=True)
 
                 # predizione
                 outputs = self.__model(images).logits
