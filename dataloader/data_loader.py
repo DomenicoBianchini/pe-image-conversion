@@ -21,7 +21,7 @@ class DataLoader:
             trainDataset,
             batch_size=32,
             shuffle=True,
-            num_workers=4,
+            num_workers=0,
             pin_memory=True
         )
 
@@ -30,7 +30,7 @@ class DataLoader:
             validationDataset,
             batch_size=32,
             shuffle=False,
-            num_workers=4,
+            num_workers=0,
             pin_memory=True
         )
 
@@ -46,7 +46,7 @@ class DataLoader:
             dataset,
             batch_size=32,
             shuffle=False,
-            num_workers=4,
+            num_workers=0,
             pin_memory=True
         )
 
