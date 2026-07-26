@@ -21,8 +21,10 @@ class DataLoader:
             trainDataset,
             batch_size=32,
             shuffle=True,
-            num_workers=4,
-            pin_memory=True
+            num_workers=2,
+            pin_memory=True,
+            prefetch_factor=1,
+            persistent_workers=False
         )
 
         # creazione DataLoader della validation
@@ -30,8 +32,10 @@ class DataLoader:
             validationDataset,
             batch_size=32,
             shuffle=False,
-            num_workers=4,
-            pin_memory=True
+            num_workers=2,
+            pin_memory=True,
+            prefetch_factor=1,
+            persistent_workers=False
         )
 
         return trainLoader, validationLoader
@@ -46,8 +50,10 @@ class DataLoader:
             dataset,
             batch_size=32,
             shuffle=False,
-            num_workers=4,
-            pin_memory=True
+            num_workers=2,
+            pin_memory=True,
+            prefetch_factor=1,
+            persistent_workers=False
         )
 
         return testLoader
