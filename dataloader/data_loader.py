@@ -13,7 +13,8 @@ class DataLoader:
         validationSize = int(0.2 * len(dataset))
         trainSize = len(dataset) - validationSize
 
-        trainDataset, validationDataset = random_split(dataset, [trainSize, validationSize])
+        generator = torch.Generator().manual_seed(42)
+        trainDataset, validationDataset = random_split(dataset, [trainSize, validationSize], generator=generator)
 
         # creazione DataLoader del training
         trainLoader = torch.utils.data.DataLoader(
