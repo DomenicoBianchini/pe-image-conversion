@@ -78,7 +78,10 @@ class Application:
             labelDictionary = LabelDictionary(self.labelsPath)
 
             # lettura di tutti i file PE presenti nella cartella
-            for fileName in os.listdir(self.filesPath):
+            fileNames = os.listdir(self.filesPath)
+            totalFiles = len(fileNames)
+
+            for index, fileName in enumerate(fileNames, start=1):
 
                 filePath = os.path.join(self.filesPath, fileName)
 
@@ -90,6 +93,10 @@ class Application:
 
                 # aggiunta del path dell'immagine e della sua label al dizionario
                 labelDictionary.addLabelImage(fileName, imagePath)
+
+                # stampa del progresso ogni 1000 immagini
+                if index % 1000 == 0 or index == totalFiles:
+                    print(f"Immagini convertite: {index}/{totalFiles}")
 
             # salvataggio del CSV contenente il mapping fra il path delle immagini e le relative label
             labelDictionary.save(self.imageLabelsPath)
