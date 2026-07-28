@@ -1,3 +1,4 @@
 mappingType,width,height,numberOfChannels,resizeWidth,resizeHeight,epochs,learningRate,TN,FP,FN,TP,precision_goodware,recall_goodware,f1_goodware,precision_malware,recall_malware,f1_malware
 LINEAR,224,224,3,0,0,4,0.001,16652,710,739,22209,0.9575,0.9591,0.9583,0.969,0.9678,0.9684
 ZIGZAG,224,224,3,0,0,4,0.001,16619,743,986,21962,0.944,0.9572,0.9506,0.9673,0.957,0.9621
+SERPENTINE,224,224,3,0,0,4,0.001,16767,595,821,22127,0.9533,0.9657,0.9595,0.9738,0.9642,0.969
