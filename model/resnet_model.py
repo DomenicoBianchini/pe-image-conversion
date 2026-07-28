@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 import torch.nn as nn
 from transformers import ResNetForImageClassification
@@ -9,6 +10,7 @@ class ResNetModel:
 
         # seed per la riproducibilità
         SEED = 42
+        np.random.seed(SEED)
         torch.manual_seed(SEED)
         torch.cuda.manual_seed_all(SEED)
 
