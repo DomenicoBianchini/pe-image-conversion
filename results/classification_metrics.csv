@@ -1,2 +1,0 @@
-mappingType,width,height,numberOfChannels,resizeWidth,resizeHeight,epochs,learningRate,TN,FP,FN,TP,precision_goodware,recall_goodware,f1_goodware,precision_malware,recall_malware,f1_malware
-LINEAR,224,224,3,0,0,4,0.001,16221,1141,1225,21723,0.9298,0.9343,0.932,0.9501,0.9466,0.9484

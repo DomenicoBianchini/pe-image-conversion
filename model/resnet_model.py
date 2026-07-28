@@ -7,6 +7,11 @@ class ResNetModel:
 
     def __init__(self, modelPath=None):
 
+        # seed per la riproducibilità
+        SEED = 42
+        torch.manual_seed(SEED)
+        torch.cuda.manual_seed_all(SEED)
+
         # device utilizzato dal modello
         self.__device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
