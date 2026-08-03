@@ -15,6 +15,7 @@ class ClassificationMetrics:
         self.__precisionMalware = 0
         self.__recallMalware = 0
         self.__f1Malware = 0
+        self.__overallAccuracy = 0
 
     def calculateMetrics(self):
 
@@ -35,6 +36,14 @@ class ClassificationMetrics:
 
         # calcolo della F1-score per la classe malware
         self.__f1Malware = 2 * self.__precisionMalware * self.__recallMalware / (self.__precisionMalware + self.__recallMalware)
+
+        # calcolo dell'overall accuracy
+        self.__overallAccuracy = (self.__trueNegative + self.__truePositive) / (
+            self.__trueNegative +
+            self.__falsePositive +
+            self.__falseNegative +
+            self.__truePositive
+        )
 
     def save(self, resultsPath, configuration):
 
@@ -61,14 +70,14 @@ class ClassificationMetrics:
                     "width",
                     "height",
                     "numberOfChannels",
-                    "resizeWidth",
-                    "resizeHeight",
+                    "resize",
                     "epochs",
                     "learningRate",
                     "TN",
                     "FP",
                     "FN",
                     "TP",
+                    "overall_accuracy",
                     "precision_goodware",
                     "recall_goodware",
                     "f1_goodware",
@@ -77,20 +86,31 @@ class ClassificationMetrics:
                     "f1_malware"
                 ])
 
+            # conversione dei valori di configurazione per il CSV
+            if configuration["height"] == 0:
+                height = "VARIABLE"
+            else:
+                height = configuration["height"]
+
+            if configuration["resizeWidth"] == 0 or configuration["resizeHeight"] == 0:
+                resize = "NO_RESIZE"
+            else:
+                resize = str(configuration["resizeWidth"]) + "x" + str(configuration["resizeHeight"])
+
             # scrittura dei risultati della configurazione
             writer.writerow([
                 configuration["mappingType"],
                 configuration["width"],
-                configuration["height"],
+                height,
                 configuration["numberOfChannels"],
-                configuration["resizeWidth"],
-                configuration["resizeHeight"],
+                resize,
                 configuration["epochs"],
                 configuration["learningRate"],
                 self.__trueNegative,
                 self.__falsePositive,
                 self.__falseNegative,
                 self.__truePositive,
+                round(self.__overallAccuracy, 4),
                 round(self.__precisionGoodware, 4),
                 round(self.__recallGoodware, 4),
                 round(self.__f1Goodware, 4),
