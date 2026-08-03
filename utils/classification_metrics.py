@@ -77,13 +77,13 @@ class ClassificationMetrics:
                     "FP",
                     "FN",
                     "TP",
-                    "overall_accuracy",
                     "precision_goodware",
                     "recall_goodware",
                     "f1_goodware",
                     "precision_malware",
                     "recall_malware",
-                    "f1_malware"
+                    "f1_malware",
+                    "overall_accuracy"
                 ])
 
             # conversione dei valori di configurazione per il CSV
@@ -110,11 +110,11 @@ class ClassificationMetrics:
                 self.__falsePositive,
                 self.__falseNegative,
                 self.__truePositive,
-                round(self.__overallAccuracy, 4),
                 round(self.__precisionGoodware, 4),
                 round(self.__recallGoodware, 4),
                 round(self.__f1Goodware, 4),
                 round(self.__precisionMalware, 4),
                 round(self.__recallMalware, 4),
-                round(self.__f1Malware, 4)
+                round(self.__f1Malware, 4),
+                round(self.__overallAccuracy, 4)
             ])
