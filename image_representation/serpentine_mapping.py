@@ -29,19 +29,18 @@ class SerpentineMapping(ImageMappingStrategy):
         # mappatura serpentina dei byte con percorrenza diagonale alternata
         for diagonal in range(height + width - 1):
 
-            positions = []
-
             startY = max(0, diagonal - (width - 1))
             endY = min(height - 1, diagonal)
 
-            for y in range(startY, endY + 1):
+            if diagonal % 2 == 0:
+                yRange = range(startY, endY + 1)
+            else:
+                yRange = range(endY, startY - 1, -1)
+
+            for y in yRange:
+
                 x = diagonal - y
-                positions.append((y, x))
 
-            if diagonal % 2 == 1:
-                positions.reverse()
-
-            for y, x in positions:
                 for c in range(numberOfChannels):
 
                     if index < len(byteData):
