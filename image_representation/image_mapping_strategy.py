@@ -18,7 +18,7 @@ class ImageMappingStrategy(ABC):
     def getVariableHeight(cls, byteCount):
 
         # calcolo dell'altezza necessaria senza modificare la configurazione
-        pixels = byteCount // cls.__numberOfChannels
+        pixels = (byteCount + cls.__numberOfChannels - 1) // cls.__numberOfChannels
         height = (pixels + cls.__width - 1) // cls.__width
 
         return height
